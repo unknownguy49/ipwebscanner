@@ -12,8 +12,9 @@ def print_nikto_progress(line_count):
 
 def run_nikto(target, out_dir):
     out_file = os.path.join(out_dir, 'nikto.txt')
-    # -Tuning 1234: File checks, interesting headers, common issues, and HTTP options (fast, but still useful)
-    cmd = ["nikto", "-h", target, "-Tuning", "1234"]
+    # -Tuning 1: Only interesting files (fastest useful scan)
+    # -maxtime 2m: Limit scan to 2 minutes
+    cmd = ["nikto", "-h", target, "-Tuning", "1", "-maxtime", "2m"]
     line_count = 0
     with open(out_file, 'w') as f:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
