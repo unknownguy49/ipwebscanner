@@ -3,15 +3,18 @@ from bs4 import BeautifulSoup
 
 def find_login_forms(gobuster_file, target):
     login_forms = set()
-    # Always check the root page
-    root_url = f"http://{target}/" if not str(target).startswith("http") else target
+    # Always check the exact target URL (including any path)
+    if not str(target).startswith("http"):
+        base_url = f"http://{target}"
+    else:
+        base_url = target
     try:
-        resp = requests.get(root_url, timeout=5)
+        resp = requests.get(base_url, timeout=5)
         soup = BeautifulSoup(resp.text, 'html.parser')
         forms = soup.find_all('form')
         for form in forms:
             if 'login' in str(form).lower():
-                login_forms.add(root_url)
+                login_forms.add(base_url)
     except Exception:
         pass
 
