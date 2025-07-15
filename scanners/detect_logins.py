@@ -2,7 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 
 def find_login_forms(gobuster_file, target):
-    login_forms = []
+    login_forms = set()
+    # Always check the root page
+    root_url = f"http://{target}/" if not str(target).startswith("http") else target
+    try:
+        resp = requests.get(root_url, timeout=5)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        forms = soup.find_all('form')
+        for form in forms:
+            if 'login' in str(form).lower():
+                login_forms.add(root_url)
+    except Exception:
+        pass
+
+    # Check Gobuster results as before
     with open(gobuster_file) as f:
         for line in f:
             if "Status: 200" in line:
@@ -13,7 +26,7 @@ def find_login_forms(gobuster_file, target):
                     forms = soup.find_all('form')
                     for form in forms:
                         if 'login' in str(form).lower():
-                            login_forms.append(url)
+                            login_forms.add(url)
                 except Exception:
                     continue
-    return login_forms
+    return list(login_forms)
